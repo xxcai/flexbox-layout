@@ -24,6 +24,7 @@ import static com.google.android.flexbox.FlexItem.FLEX_SHRINK_NOT_SET;
 import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -426,8 +427,10 @@ class FlexboxHelper {
 
         int childCount = mFlexContainer.getFlexItemCount();
         for (int i = fromIndex; i < childCount; i++) {
+            Log.d("cx_dbg", "calculateFlexLines i = " + i + ". isMainHorizontal = " + isMainHorizontal);
             View child = mFlexContainer.getReorderedFlexItemAt(i);
 
+            // 下面这三个都不会走
             if (child == null) {
                 if (isLastFlexItem(i, childCount, flexLine)) {
                     addFlexLine(flexLines, flexLine, i, sumCrossSize);
@@ -463,6 +466,7 @@ class FlexboxHelper {
             int childMainMeasureSpec;
             int childCrossMeasureSpec;
             if (isMainHorizontal) {
+                // 走这里
                 childMainMeasureSpec = mFlexContainer.getChildWidthMeasureSpec(mainMeasureSpec,
                         mainPaddingStart + mainPaddingEnd +
                                 getFlexItemMarginStartMain(flexItem, true) +
@@ -508,6 +512,7 @@ class FlexboxHelper {
                             + getFlexItemMarginStartMain(flexItem, isMainHorizontal) +
                             getFlexItemMarginEndMain(flexItem, isMainHorizontal),
                     flexItem, i, indexInFlexLine, flexLines.size())) {
+                Log.d("cx_dbg", "enter isWrapRequired = true");
                 if (flexLine.getItemCountNotGone() > 0) {
                     addFlexLine(flexLines, flexLine, i > 0 ? i - 1 : 0, sumCrossSize);
                     sumCrossSize += flexLine.mCrossSize;
@@ -558,6 +563,8 @@ class FlexboxHelper {
                 indexInFlexLine = 0;
                 largestSizeInCross = Integer.MIN_VALUE;
             } else {
+                // 走这里
+                Log.d("cx_bdg", "isWrapRequired = false");
                 flexLine.mItemCount++;
                 indexInFlexLine++;
             }
@@ -600,6 +607,7 @@ class FlexboxHelper {
             }
 
             if (isLastFlexItem(i, childCount, flexLine)) {
+                Log.d("cx_dbg", "isLastFlexItem = true");
                 addFlexLine(flexLines, flexLine, i, sumCrossSize);
                 sumCrossSize += flexLine.mCrossSize;
             }
@@ -881,11 +889,13 @@ class FlexboxHelper {
         if (maxLine != NOT_SET && maxLine <= flexLinesSize + 1) {
             return false;
         }
+        // 这里拿的有问题
         int decorationLength =
                 mFlexContainer.getDecorationLengthMainAxis(view, index, indexInFlexLine);
         if (decorationLength > 0) {
             childLength += decorationLength;
         }
+        Log.d("cx_dbg", "maxSize = " + maxSize + ", currentLength = " + currentLength + ", childLength = " + childLength + ", decorationLength = " + decorationLength);
         return maxSize < currentLength + childLength;
     }
 
@@ -896,6 +906,7 @@ class FlexboxHelper {
 
     private void addFlexLine(List<FlexLine> flexLines, FlexLine flexLine, int viewIndex,
             int usedCrossSizeSoFar) {
+        Log.d("cx_dbg", "addFlexLine, beforeSize = " + flexLines.size());
         flexLine.mSumCrossSizeBefore = usedCrossSizeSoFar;
         mFlexContainer.onNewFlexLineAdded(flexLine);
         flexLine.mLastIndex = viewIndex;

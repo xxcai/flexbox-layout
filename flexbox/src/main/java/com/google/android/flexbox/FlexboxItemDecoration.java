@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
@@ -103,15 +104,19 @@ public class FlexboxItemDecoration extends RecyclerView.ItemDecoration {
             RecyclerView parent,
             @NonNull RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        Log.d("cx_dbg", "getItemOffsets i = " + position);
         if (position == 0) {
             return;
         }
+        //Log.d("cx_dbg", "needsHorizontalDecoration = " + needsHorizontalDecoration());
+        //Log.d("cx_dbg", "needsVerticalDecoration = " + needsVerticalDecoration());
         if (!needsHorizontalDecoration() && !needsVerticalDecoration()) {
             outRect.set(0, 0, 0, 0);
             return;
         }
         FlexboxLayoutManager layoutManager = (FlexboxLayoutManager) parent.getLayoutManager();
         List<FlexLine> flexLines = layoutManager.getFlexLines();
+        Log.d("cx_dbg", "flexLines size = " + flexLines.size());
         int flexDirection = layoutManager.getFlexDirection();
         setOffsetAlongMainAxis(outRect, position, layoutManager, flexLines, flexDirection);
         setOffsetAlongCrossAxis(outRect, position, layoutManager, flexLines);
@@ -147,12 +152,13 @@ public class FlexboxItemDecoration extends RecyclerView.ItemDecoration {
                 outRect.right = 0;
             }
         }
-
+        Log.d("cx_dbg", "setOffsetAlongCrossAxis outRect = " + outRect);
     }
 
     private void setOffsetAlongMainAxis(Rect outRect, int position,
             FlexboxLayoutManager layoutManager, List<FlexLine> flexLines, int flexDirection) {
         if (isFirstItemInLine(position, flexLines, layoutManager)) {
+            // 最后一个在这里return了
             return;
         }
 
@@ -183,7 +189,7 @@ public class FlexboxItemDecoration extends RecyclerView.ItemDecoration {
                 outRect.bottom = 0;
             }
         }
-
+        Log.d("cx_dbg", "setOffsetAlongMainAxis outRect = " + outRect);
     }
 
     private void drawVerticalDecorations(Canvas canvas, RecyclerView parent) {

@@ -390,6 +390,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
     @Override
     public int getDecorationLengthMainAxis(View view, int index, int indexInFlexLine) {
         if (isMainAxisDirectionHorizontal()) {
+            Log.d("cx_dbg", "getDecorationLengthMainAxis left = " + getLeftDecorationWidth(view) + ", right = " + getRightDecorationWidth(view));
             return getLeftDecorationWidth(view) + getRightDecorationWidth(view);
         } else {
             return getTopDecorationHeight(view) + getBottomDecorationHeight(view);
@@ -405,11 +406,21 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
         }
     }
 
+    private RecyclerView mRv = null;
+
+    public void setRecyclerView(RecyclerView rv) {
+        mRv = rv;
+    }
+
     @Override
     public void onNewFlexItemAdded(View view, int index, int indexInFlexLine, FlexLine flexLine) {
         // To avoid creating a new Rect instance every time, passing the same Rect instance
         // since calculated decorations are assigned to view's LayoutParams inside the
         // calculateItemDecorationsForChild method anyway.
+//        if (mRv != null) {
+//            mRv.invalidateItemDecorations();
+//        }
+
         calculateItemDecorationsForChild(view, TEMP_RECT);
         if (isMainAxisDirectionHorizontal()) {
             int decorationWidth = getLeftDecorationWidth(view) + getRightDecorationWidth(view);
@@ -862,6 +873,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
     }
 
     private void updateFlexLines(int childCount) {
+        Log.d("cx_dbg", "updateFlexLines start " + mFlexLines.size());
         //noinspection ResourceType
         int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(getWidth(), getWidthMode());
         //noinspection ResourceType
@@ -904,6 +916,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
                 (mPendingScrollPosition != NO_POSITION || isMainSizeChanged)) {
             if (mAnchorInfo.mLayoutFromEnd) {
                 // Prior flex lines should be already calculated, don't have to be updated
+                Log.d("cx_dbg", "updateFlexLines end 1 " + mFlexLines.size());
                 return;
             }
             // TODO: This path may need another consideration to not calculate the entire flex
@@ -991,6 +1004,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
             // or even if not (when flex wrap is "nowrap") the size of the flex lines should be 1.
             mFlexboxHelper.stretchViews(fromIndex);
         }
+        Log.d("cx_dbg", "updateFlexLines end 0 " + mFlexLines.size());
     }
 
     @Override
@@ -1517,6 +1531,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
                 throw new IllegalStateException(
                         "Invalid justifyContent is set: " + mJustifyContent);
         }
+        Log.d("cx_dbg", "mAnchorInfo = " + mAnchorInfo);
         childLeft -= mAnchorInfo.mPerpendicularCoordinate;
         childRight -= mAnchorInfo.mPerpendicularCoordinate;
         spaceBetweenItem = Math.max(spaceBetweenItem, 0);
@@ -1524,6 +1539,7 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
         // Used only when mLayoutDirection == LayoutState.LAYOUT_START to remember the index
         // a flex item should be inserted
         int indexInFlexLine = 0;
+        Log.d("cx_dbg", "flexLine.getItemCount() = " + flexLine.getItemCount());
         for (int i = startPosition, itemCount = flexLine.getItemCount();
                 i < startPosition + itemCount; i++) {
             View view = getFlexItemAt(i);
